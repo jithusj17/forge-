@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Forge (web)
 
-## Getting Started
+A v0-style "describe it → get an app" builder. Research: [`../docs/reverse-engineering/v0-analysis.md`](../docs/reverse-engineering/v0-analysis.md). Plan: [`../docs/implementation-plan.md`](../docs/implementation-plan.md).
 
-First, run the development server:
+**Phase 1 (current):** complete UI with a **mock** generation engine. No API keys needed. Chats are stored in your browser's `localStorage`.
+
+## Run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
+npm run build && npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Layout
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Path | What |
+|---|---|
+| `src/app/globals.css` | Design tokens (light/dark scales, alpha ramp, type scale, shadows, motion) |
+| `src/app/page.tsx` | Landing: hero + composer + suggestion chips, templates, features |
+| `src/app/chat/[id]/page.tsx` | Workspace route |
+| `src/components/composer/` | Tiptap prompt composer, model picker |
+| `src/components/workspace/` | Header, chat panel, assistant turns (steps, version cards), preview + code panels |
+| `src/components/ui/` | Button, segmented tabs, menu |
+| `src/lib/store.ts` | Client chat store (localStorage) |
+| `src/lib/mock-engine.ts` | Streams fake steps → files → summary, in the same shape the real engine will use |
+| `src/lib/mock-templates.ts` | Canned projects (contact form, tasks, loan calculator, landing page) |
+| `src/lib/brand.ts` | Product name (placeholder "Forge") |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Notes
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Previews render in an iframe with `srcDoc` + `sandbox` **without** `allow-same-origin`, so generated code gets an opaque origin and can't touch the app. Phase 2 moves previews to a separate domain.
+- Next.js 16 with Cache Components is enabled. Read `node_modules/next/dist/docs/` before changing routing or data fetching (see `AGENTS.md`).
