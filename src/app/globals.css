@@ -1,26 +1,328 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Theme follows the OS by default; `.light` / `.dark` on <html> force a theme. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------- Tokens: light ---------- */
+:root,
+.light {
+  color-scheme: light;
+
+  --bg-100: #ffffff;
+  --bg-200: #fafafa;
+  --bg-300: #ffffff;
+
+  --gray-100: #f2f2f2;
+  --gray-200: #ebebeb;
+  --gray-300: #e6e6e6;
+  --gray-400: #ebebeb;
+  --gray-500: #c9c9c9;
+  --gray-600: #a8a8a8;
+  --gray-700: #8f8f8f;
+  --gray-800: #7d7d7d;
+  --gray-900: #666666;
+  --gray-1000: #171717;
+
+  --alpha-100: rgb(0 0 0 / 0.051);
+  --alpha-200: rgb(0 0 0 / 0.082);
+  --alpha-300: rgb(0 0 0 / 0.102);
+  --alpha-400: rgb(0 0 0 / 0.078);
+  --alpha-500: rgb(0 0 0 / 0.212);
+  --alpha-600: rgb(0 0 0 / 0.341);
+
+  --blue-100: #f0f7ff;
+  --blue-400: #cce6ff;
+  --blue-500: #99ceff;
+  --blue-700: #0072f5;
+  --blue-900: #0068d6;
+  --red-700: #e5484d;
+  --red-900: #cb2a2f;
+  --green-700: #45a557;
+  --green-900: #297a3a;
+  --amber-700: #ffb224;
+
+  --material-border: var(--alpha-400);
+  --shadow-color: rgb(0 0 0 / 0.04);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* ---------- Tokens: dark ---------- */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not(.light) {
+    color-scheme: dark;
+
+    --bg-100: #0a0a0a;
+    --bg-200: #000000;
+    --bg-300: #121212;
+
+    --gray-100: #1a1a1a;
+    --gray-200: #1f1f1f;
+    --gray-300: #292929;
+    --gray-400: #2e2e2e;
+    --gray-500: #454545;
+    --gray-600: #878787;
+    --gray-700: #8f8f8f;
+    --gray-800: #7d7d7d;
+    --gray-900: #a1a1a1;
+    --gray-1000: #ededed;
+
+    --alpha-100: rgb(255 255 255 / 0.067);
+    --alpha-200: rgb(255 255 255 / 0.086);
+    --alpha-300: rgb(255 255 255 / 0.125);
+    --alpha-400: rgb(255 255 255 / 0.145);
+    --alpha-500: rgb(255 255 255 / 0.239);
+    --alpha-600: rgb(255 255 255 / 0.506);
+
+    --blue-100: #0f1c2e;
+    --blue-400: #0d3868;
+    --blue-500: #0a4380;
+    --blue-700: #0072f5;
+    --blue-900: #52a8ff;
+    --red-700: #e5484d;
+    --red-900: #ff6166;
+    --green-700: #45a557;
+    --green-900: #62c073;
+    --amber-700: #ffb224;
+
+    --material-border: var(--gray-300);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.dark {
+  color-scheme: dark;
+
+  --bg-100: #0a0a0a;
+  --bg-200: #000000;
+  --bg-300: #121212;
+
+  --gray-100: #1a1a1a;
+  --gray-200: #1f1f1f;
+  --gray-300: #292929;
+  --gray-400: #2e2e2e;
+  --gray-500: #454545;
+  --gray-600: #878787;
+  --gray-700: #8f8f8f;
+  --gray-800: #7d7d7d;
+  --gray-900: #a1a1a1;
+  --gray-1000: #ededed;
+
+  --alpha-100: rgb(255 255 255 / 0.067);
+  --alpha-200: rgb(255 255 255 / 0.086);
+  --alpha-300: rgb(255 255 255 / 0.125);
+  --alpha-400: rgb(255 255 255 / 0.145);
+  --alpha-500: rgb(255 255 255 / 0.239);
+  --alpha-600: rgb(255 255 255 / 0.506);
+
+  --blue-100: #0f1c2e;
+  --blue-400: #0d3868;
+  --blue-500: #0a4380;
+  --blue-700: #0072f5;
+  --blue-900: #52a8ff;
+  --red-700: #e5484d;
+  --red-900: #ff6166;
+  --green-700: #45a557;
+  --green-900: #62c073;
+  --amber-700: #ffb224;
+
+  --material-border: var(--gray-300);
+}
+
+/* ---------- Tailwind theme mapping ---------- */
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-bg-100: var(--bg-100);
+  --color-bg-200: var(--bg-200);
+  --color-bg-300: var(--bg-300);
+
+  --color-gray-100: var(--gray-100);
+  --color-gray-200: var(--gray-200);
+  --color-gray-300: var(--gray-300);
+  --color-gray-400: var(--gray-400);
+  --color-gray-500: var(--gray-500);
+  --color-gray-600: var(--gray-600);
+  --color-gray-700: var(--gray-700);
+  --color-gray-800: var(--gray-800);
+  --color-gray-900: var(--gray-900);
+  --color-gray-1000: var(--gray-1000);
+
+  --color-alpha-100: var(--alpha-100);
+  --color-alpha-200: var(--alpha-200);
+  --color-alpha-300: var(--alpha-300);
+  --color-alpha-400: var(--alpha-400);
+  --color-alpha-500: var(--alpha-500);
+  --color-alpha-600: var(--alpha-600);
+
+  --color-blue-100: var(--blue-100);
+  --color-blue-400: var(--blue-400);
+  --color-blue-500: var(--blue-500);
+  --color-blue-700: var(--blue-700);
+  --color-blue-900: var(--blue-900);
+  --color-red-700: var(--red-700);
+  --color-red-900: var(--red-900);
+  --color-green-700: var(--green-700);
+  --color-green-900: var(--green-900);
+  --color-amber-700: var(--amber-700);
+
+  --radius-sm: 6px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  --ease-forge: cubic-bezier(0.31, 0.1, 0.08, 0.96);
+
+  --shadow-small: 0 1px 2px var(--shadow-color);
+  --shadow-medium: 0 2px 2px var(--shadow-color), 0 8px 8px -8px var(--shadow-color);
+  --shadow-menu: 0 0 0 1px var(--alpha-400), 0 1px 1px rgb(0 0 0 / 0.02), 0 4px 8px -4px rgb(0 0 0 / 0.04),
+    0 16px 24px -8px rgb(0 0 0 / 0.06);
+  --shadow-modal: 0 0 0 1px var(--alpha-400), 0 1px 1px rgb(0 0 0 / 0.02), 0 8px 16px -4px rgb(0 0 0 / 0.04),
+    0 24px 32px -8px rgb(0 0 0 / 0.06);
+}
+
+/* ---------- Type scale ---------- */
+@utility text-heading-48 {
+  font-size: 48px;
+  line-height: 56px;
+  font-weight: 600;
+  letter-spacing: -2.4px;
+}
+@utility text-heading-32 {
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 600;
+  letter-spacing: -1.28px;
+}
+@utility text-heading-24 {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+  letter-spacing: -0.96px;
+}
+@utility text-heading-16 {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: -0.32px;
+}
+@utility text-label-16 {
+  font-size: 16px;
+  line-height: 20px;
+}
+@utility text-label-14 {
+  font-size: 14px;
+  line-height: 20px;
+}
+@utility text-label-13 {
+  font-size: 13px;
+  line-height: 16px;
+}
+@utility text-label-12 {
+  font-size: 12px;
+  line-height: 16px;
+}
+@utility text-copy-14 {
+  font-size: 14px;
+  line-height: 20px;
+}
+@utility text-copy-13 {
+  font-size: 13px;
+  line-height: 18px;
+}
+@utility text-label-13-mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 20px;
+}
+@utility text-label-12-mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+/* ---------- Surfaces ---------- */
+@utility material-medium {
+  border: 1px solid var(--material-border);
+  background-color: var(--bg-100);
+  background-clip: padding-box;
+  border-radius: 6px;
+  box-shadow: var(--shadow-medium);
+}
+@utility hairline-b {
+  border-bottom: 1px solid var(--gray-100);
+}
+
+/* ---------- Base ---------- */
+@layer base {
+  html,
+  body {
+    background-color: var(--bg-200);
+    color: var(--gray-1000);
+  }
+  body {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  ::selection {
+    background-color: var(--blue-500);
+  }
+}
+
+@keyframes forge-prefill {
+  from {
+    background-color: var(--alpha-300);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+/* Tiptap placeholder */
+.forge-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--gray-900);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+.forge-editor .ProseMirror {
+  outline: none;
+}
+.forge-editor .ProseMirror p {
+  margin: 0;
+}
+
+/* Shiki output inside the code panel */
+.forge-code pre {
+  background: transparent !important;
+  margin: 0;
+  padding: 12px 0;
+  counter-reset: line;
+}
+.forge-code code {
+  display: block;
+}
+.forge-code .line {
+  display: inline-block;
+  width: 100%;
+  padding: 0 16px 0 0;
+}
+.forge-code .line::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 3rem;
+  margin-right: 16px;
+  text-align: right;
+  color: var(--gray-700);
+}
+html.dark .forge-code .shiki,
+html.dark .forge-code .shiki span {
+  color: var(--shiki-dark) !important;
+}
+@media (prefers-color-scheme: dark) {
+  html:not(.light) .forge-code .shiki,
+  html:not(.light) .forge-code .shiki span {
+    color: var(--shiki-dark) !important;
+  }
 }
