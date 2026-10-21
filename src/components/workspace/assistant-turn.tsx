@@ -81,9 +81,15 @@ export function AssistantTurn({ message, chat, state }: { message: Message; chat
           ))}
           {!streaming && (
             <div className="flex items-center justify-between pt-1 text-gray-900">
-              <span className="flex items-center gap-1.5">
+              <span className="flex items-center gap-1.5" title="Estimated API cost of this turn">
                 <Hexagon className="size-3.5" />
-                used <span className="text-gray-1000">{message.credits?.toFixed(3)}</span> credits
+                {message.credits ? (
+                  <>
+                    cost <span className="text-gray-1000">${message.credits.toFixed(message.credits < 0.01 ? 4 : 2)}</span>
+                  </>
+                ) : (
+                  "Demo mode"
+                )}
               </span>
               <span className="flex items-center gap-1.5">
                 <Clock className="size-3.5" />
