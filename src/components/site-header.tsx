@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Menu as MenuIcon } from "lucide-react";
+import { UserMenu } from "@/components/auth/user-menu";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 
@@ -33,12 +34,7 @@ export function SiteHeader() {
       </nav>
 
       <div className="flex items-center gap-2">
-        <Button variant="secondary" size="sm" className="hidden sm:inline-flex">
-          Log In
-        </Button>
-        <Button variant="default" size="sm">
-          Sign Up
-        </Button>
+        <UserMenu />
         <Button variant="ghost" size="icon-sm" className="md:hidden" aria-label="Open menu">
           <MenuIcon />
         </Button>
