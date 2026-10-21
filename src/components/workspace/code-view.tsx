@@ -97,7 +97,7 @@ function HighlightedCode({ file }: { file: ProjectFile }) {
     // Shiki is loaded lazily so it stays out of the landing-page bundle.
     import("shiki/bundle/web").then(({ codeToHtml }) =>
       codeToHtml(file.content, {
-        lang: file.language === "json" ? "json" : file.language,
+        lang: file.language === "md" ? "markdown" : file.language,
         themes: { light: "github-light", dark: "github-dark" },
         defaultColor: "light",
       }).then((out) => {

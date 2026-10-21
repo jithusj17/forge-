@@ -13,11 +13,12 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef, useState, useTransition } from "react";
+import { createChatAction } from "@/app/actions";
+import { useAuth } from "@/components/auth/auth-provider";
 import { Composer, type ComposerHandle } from "@/components/composer/composer";
 import { Button } from "@/components/ui/button";
-import { createChat } from "@/lib/store";
-import { sendPrompt } from "@/lib/mock-engine";
+import { setPendingPrompt } from "@/lib/generate-client";
 import type { ModelId } from "@/lib/types";
 
 const SUGGESTIONS: { label: string; icon: LucideIcon; prompt: string }[] = [
@@ -33,14 +34,29 @@ const SUGGESTIONS: { label: string; icon: LucideIcon; prompt: string }[] = [
 
 export function Hero() {
   const router = useRouter();
+  const { requireAuth } = useAuth();
   const composer = useRef<ComposerHandle>(null);
   const [page, setPage] = useState(0);
+  const [starting, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
   const visible = Array.from({ length: 4 }, (_, i) => SUGGESTIONS[(page * 4 + i) % SUGGESTIONS.length]);
 
-  function start(prompt: string, model: ModelId) {
-    const chat = createChat(prompt, model);
-    router.push(`/chat/${chat.id}`);
-    void sendPrompt(chat.id, prompt);
+  async function start(prompt: string, model: ModelId) {
+    setError(null);
+    if (!(await requireAuth("Sign in or continue as a guest to start building."))) {
+      composer.current?.prefill(prompt);
+      return;
+    }
+    startTransition(async () => {
+      try {
+        const id = await createChatAction(prompt, model);
+        setPendingPrompt(id, prompt, model);
+        router.push(`/chat/${id}`);
+      } catch {
+        composer.current?.prefill(prompt);
+        setError("Couldn't create the chat. Please try again.");
+      }
+    });
   }
 
   return (
@@ -49,7 +65,8 @@ export function Hero() {
         What do you want to build?
       </h1>
       <div className="mx-auto w-full max-w-[690px]">
-        <Composer ref={composer} onSubmit={start} autoFocus />
+        <Composer ref={composer} onSubmit={start} busy={starting} autoFocus />
+        {error && <p className="pt-2 text-center text-label-13 text-red-900">{error}</p>}
         <div className="flex flex-wrap items-center justify-center gap-2 pb-2 pt-4">
           {visible.map(({ label, icon: Icon, prompt }) => (
             <Button key={label} variant="pill" size="sm" onClick={() => composer.current?.prefill(prompt)}>

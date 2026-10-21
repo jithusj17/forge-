@@ -1,6 +1,7 @@
 "use client";
 
 import { Code2, LoaderCircle } from "lucide-react";
+import dynamic from "next/dynamic";
 import { cn } from "@/lib/cn";
 import type { Chat, Version } from "@/lib/types";
 import { CodeView } from "./code-view";
@@ -33,22 +34,32 @@ function PreviewFrame({ version, device, reloadKey }: { version: Version; device
   return (
     <div className="flex h-full w-full justify-center overflow-auto bg-gray-100/40">
       <div className={cn("overflow-hidden bg-white transition-[width,height,border-radius] duration-200 ease-forge", DEVICE_FRAME[device])}>
-        {/*
-          Generated code never runs on the app origin: srcDoc + sandbox without
-          allow-same-origin gives the frame an opaque origin (no cookies/storage/parent access).
-          Phase 2 moves this to a dedicated preview domain.
-        */}
-        <iframe
-          key={`${version.n}-${reloadKey}`}
-          title={`Preview v${version.n}`}
-          srcDoc={version.previewHtml}
-          sandbox="allow-scripts allow-forms allow-modals allow-popups"
-          className="h-full w-full select-none border-0"
-        />
+        {version.runtime === "react" ? (
+          <SandpackPreviewFrame version={version} reloadKey={reloadKey} />
+        ) : (
+          // Demo projects: srcDoc + sandbox without allow-same-origin gives the frame an
+          // opaque origin (no access to Forge's cookies, storage or DOM).
+          <iframe
+            key={`${version.n}-${reloadKey}`}
+            title={`Preview v${version.n}`}
+            srcDoc={version.previewHtml ?? ""}
+            sandbox="allow-scripts allow-forms allow-modals allow-popups"
+            className="h-full w-full select-none border-0"
+          />
+        )}
       </div>
     </div>
   );
 }
+
+const SandpackPreviewFrame = dynamic(() => import("./sandpack-preview"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full items-center justify-center gap-2 bg-bg-100 text-label-13 text-gray-900">
+      <LoaderCircle className="size-4 animate-spin" /> Starting preview…
+    </div>
+  ),
+});
 
 function EmptyOutput({ generating }: { generating: boolean }) {
   return (

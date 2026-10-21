@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  AlertCircle,
   Braces,
+  History,
   Brain,
   ChevronDown,
   ChevronRight,
@@ -17,7 +19,8 @@ import {
   RotateCw,
   Search,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { restoreVersionAction } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Menu, MenuContent, MenuItem, MenuTrigger } from "@/components/ui/menu";
 import { cn } from "@/lib/cn";
@@ -27,6 +30,7 @@ import type { WorkspaceState } from "./workspace";
 
 export function AssistantTurn({ message, chat, state }: { message: Message; chat: Chat; state: WorkspaceState }) {
   const streaming = message.status === "streaming";
+  const [now] = useState(() => Date.now());
   // Open while working; collapsed afterwards unless the user expands it.
   const [open, setOpen] = useState<boolean | null>(null);
   const expanded = open ?? streaming;
@@ -62,7 +66,7 @@ export function AssistantTurn({ message, chat, state }: { message: Message; chat
               <Copy />
               Copy
             </MenuItem>
-            <MenuItem onSelect={() => navigator.clipboard?.writeText(`${location.origin}/chat/${chat.id}#${message.id}`)}>
+            <MenuItem onSelect={() => navigator.clipboard?.writeText(`${location.origin}/chat/${chat.id}`)}>
               <Link2 />
               Copy Link
             </MenuItem>
@@ -83,7 +87,7 @@ export function AssistantTurn({ message, chat, state }: { message: Message; chat
               </span>
               <span className="flex items-center gap-1.5">
                 <Clock className="size-3.5" />
-                {timeAgo(message.createdAt)}
+                {timeAgo(message.createdAt, now)}
               </span>
             </div>
           )}
@@ -97,6 +101,12 @@ export function AssistantTurn({ message, chat, state }: { message: Message; chat
           .map((s) => <VersionCard key={s.id} step={s} chat={chat} state={state} />)}
 
       {message.content && <p className="whitespace-pre-wrap text-gray-1000">{renderInlineCode(message.content)}</p>}
+      {message.error && (
+        <p className={cn("flex items-center gap-1.5", message.status === "error" ? "text-red-900" : "text-gray-900")}>
+          {message.status === "error" && <AlertCircle className="size-3.5" />}
+          {message.error}
+        </p>
+      )}
     </li>
   );
 }
@@ -129,8 +139,11 @@ function StepRow({ step, chat, state }: { step: Step; chat: Chat; state: Workspa
 
 function VersionCard({ step, chat, state }: { step: Step; chat: Chat; state: WorkspaceState }) {
   const [open, setOpen] = useState(false);
+  const [restoring, startRestore] = useTransition();
   const selected = state.versionN === step.versionN;
   const exists = chat.versions.some((v) => v.n === step.versionN);
+  const latest = chat.versions.at(-1)?.n;
+  const canRestore = chat.isOwner && exists && step.done && step.versionN !== latest && !state.generating;
 
   return (
     <div className={cn("rounded-lg border bg-bg-100 transition-colors", selected ? "border-gray-500" : "border-alpha-400")}>
@@ -151,6 +164,29 @@ function VersionCard({ step, chat, state }: { step: Step; chat: Chat; state: Wor
           <span className="truncate font-medium text-gray-1000">{step.label}</span>
           <span className="text-gray-900">v{step.versionN}</span>
         </button>
+        {canRestore && (
+          <Button
+            variant="ghost"
+            size="xs"
+            className="h-6 text-gray-900"
+            disabled={restoring}
+            title={`Make v${step.versionN} the latest version`}
+            onClick={() =>
+              startRestore(async () => {
+                const result = await restoreVersionAction(chat.id, step.versionN!);
+                if (result)
+                  state.setChat((c) => ({
+                    ...c,
+                    messages: [...c.messages, result.message],
+                    versions: [...c.versions, result.version],
+                  }));
+              })
+            }
+          >
+            <History />
+            Restore
+          </Button>
+        )}
       </div>
       {(open || !step.done) && step.files && step.files.length > 0 && (
         <ul className="flex flex-col px-1.5 pb-1.5">
